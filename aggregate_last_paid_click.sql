@@ -55,4 +55,5 @@ left join unoin_ads as u
 where LPC.rang = 1
 group by 1,2,3,4,6
 order by revenue desc NULLS last, LPC.visit_date asc, visitors_count desc, LPC.utm_source asc, LPC.utm_medium asc, LPC.utm_campaign asc
+limit 15
 ;
