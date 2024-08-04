@@ -11,12 +11,11 @@ with tab as(
 		l.amount,
 		l.closing_reason,
 		l.status_id,
-		row_number() over(partition by s.visitor_id order by s.visit_date) as rang
+		row_number() over(partition by s.visitor_id order by s.visit_date desc) as rang
 	from sessions s 
 	left join leads l on s.visitor_id  = l.visitor_id 
 		and s.visit_date < l.created_at
 	where s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
-	order by s.visit_date desc
 )
 
 select 
@@ -32,7 +31,7 @@ select
 		status_id
 from tab
 where rang = 1
-order by amount desc NULLS last, visit_date asc, utm_source, utm_medium, utm_campaign
+order by amount desc NULLS last, visit_date asc, utm_source asc, utm_medium asc, utm_campaign asc
 limit 10;
 
 
