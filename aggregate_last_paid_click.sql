@@ -1,3 +1,4 @@
+---Посчитайте расходы на рекламу по модели атрибуции Last Paid Click
 with LPC as (
 	select 
 		s.visitor_id,
@@ -10,10 +11,10 @@ with LPC as (
 		l.amount,
 		l.closing_reason,
 		l.status_id,
-		row_number() over(partition by s.visitor_id order by s.visit_date) as rang
+		row_number() over(partition by s.visitor_id order by s.visit_date desc) as rang
 	from sessions s 
 	left join leads l on s.visitor_id  = l.visitor_id 
-		and s.visit_date < l.created_at
+		and s.visit_date <= l.created_at
 	where s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
 ), unoin_ads as (
 SELECT
@@ -42,9 +43,8 @@ select
 		LPC.utm_campaign,
 		u.daily_spent as total_cost,
 		count(distinct LPC.lead_id) as leads_count,
-		(select count(LPC.lead_id) 
-		from LPC
-		where LPC.status_id = 142) as purchases_count,
+		count(LPC.lead_id)  filter (
+			where LPC.status_id = 142) as purchases_count,
 		sum(LPC.amount) as revenue
 		from LPC
 left join unoin_ads as u 
@@ -55,5 +55,5 @@ left join unoin_ads as u
 where LPC.rang = 1
 group by 1,3,4,5,6
 order by revenue desc NULLS last, LPC.visit_date asc, visitors_count desc, LPC.utm_source asc, LPC.utm_medium asc, LPC.utm_campaign asc
-limit 15
-;
+limit 15;
+
