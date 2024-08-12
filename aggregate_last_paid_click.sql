@@ -36,10 +36,10 @@ SELECT
 )
 select 
 		LPC.visit_date,
+		count(LPC.visitor_id) as visitors_count,
 		LPC.utm_source,
 		LPC.utm_medium,
 		LPC.utm_campaign,
-		count(LPC.visitor_id) as visitors_count,
 		u.daily_spent as total_cost,
 		count(distinct LPC.lead_id) as leads_count,
 		(select count(LPC.lead_id) 
@@ -53,7 +53,7 @@ left join unoin_ads as u
 	and	u.utm_medium = LPC.utm_medium 
 	and	u.utm_campaign = LPC.utm_campaign 
 where LPC.rang = 1
-group by 1,2,3,4,6
+group by 1,3,4,5,6
 order by revenue desc NULLS last, LPC.visit_date asc, visitors_count desc, LPC.utm_source asc, LPC.utm_medium asc, LPC.utm_campaign asc
 limit 15
 ;
