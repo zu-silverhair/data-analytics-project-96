@@ -9,7 +9,7 @@ with lp as (
     from sessions as s
     group by 1, 2
 )
-  
+
 select
     sum(lp.count_visitor) as count_month,
     round(sum(lp.count_visitor) / 5, 0) as count_week,
@@ -33,27 +33,27 @@ with lpc as (
         l.status_id,
         row_number() over (partition by s.visitor_id order by s.visit_date desc) as rang
     from sessions as s
-    left join 
-        leads l on s.visitor_id  = l.visitor_id 
-        and s.visit_date <= l.created_at
+    left join leads l on 
+        s.visitor_id = l.visitor_id
+            and s.visit_date <= l.created_at
     where s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
 ), unoin_ads as (
-SELECT
+select
         vk.campaign_date::date,
         vk.utm_source,
         vk.utm_medium,
         vk.utm_campaign,
         sum(vk.daily_spent) as daily_spent
-    FROM vk_ads AS vk
+    from vk_ads AS vk
     group by 1,2,3,4
     union all
-    SELECT
+    select
         ya.campaign_date::date,
         ya.utm_source,
         ya.utm_medium,
         ya.utm_campaign,
         sum(ya.daily_spent) as daily_spent
-    FROM ya_ads as ya 
+    from ya_ads as ya 
     group by 1,2,3,4
 )
 select 
@@ -125,22 +125,22 @@ with lpc as (
     where s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
     and s."source" in ('vk', 'yandex')
 ), unoin_ads as (
-SELECT
+select
         vk.campaign_date::date,
         vk.utm_source,
         vk.utm_medium,
         vk.utm_campaign,
         sum(vk.daily_spent) as daily_spent
-    FROM vk_ads AS vk
+    from vk_ads AS vk
     group by 1,2,3,4
     union all
-    SELECT
+    select
         ya.campaign_date::date,
         ya.utm_source,
         ya.utm_medium,
         ya.utm_campaign,
         sum(ya.daily_spent) as daily_spent
-    FROM ya_ads as ya 
+    from ya_ads as ya 
     group by 1,2,3,4
 )
 select 
@@ -187,22 +187,22 @@ with lpc as (
     where s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
     and s."source" in ('vk', 'yandex')
 ), unoin_ads as (
-SELECT
+select
         vk.campaign_date::date,
         vk.utm_source,
         vk.utm_medium,
         vk.utm_campaign,
         sum(vk.daily_spent) as daily_spent
-    FROM vk_ads AS vk
+    from vk_ads AS vk
     group by 1,2,3,4
     union all
-    SELECT
+    select
         ya.campaign_date::date,
         ya.utm_source,
         ya.utm_medium,
         ya.utm_campaign,
         sum(ya.daily_spent) as daily_spent
-    FROM ya_ads as ya 
+    from ya_ads as ya 
     group by 1,2,3,4
 ),  metrics as (
 select 
@@ -340,22 +340,22 @@ order by revenue desc
     where s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
     and s."source" in ('vk', 'yandex')
 ), unoin_ads as (
-SELECT
+select
         vk.campaign_date::date,
         vk.utm_source,
         vk.utm_medium,
         vk.utm_campaign,
         sum(vk.daily_spent) as daily_spent
-    FROM vk_ads AS vk
+    from vk_ads AS vk
     group by 1,2,3,4
     union all
-    SELECT
+    select
         ya.campaign_date::date,
         ya.utm_source,
         ya.utm_medium,
         ya.utm_campaign,
         sum(ya.daily_spent) as daily_spent
-    FROM ya_ads as ya 
+    from ya_ads as ya 
     group by 1,2,3,4
 )
 select 
@@ -392,22 +392,22 @@ with lpc as (
         and s.visit_date <= l.created_at
     where s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
 ), unoin_ads as (
-SELECT
+select
         vk.campaign_date::date,
         vk.utm_source,
         vk.utm_medium,
         vk.utm_campaign,
         coalesce(sum(vk.daily_spent), 0) as daily_spent
-    FROM vk_ads AS vk
+    from vk_ads AS vk
     group by 1,2,3,4
     union all
-    SELECT
+    select
         ya.campaign_date::date,
         ya.utm_source,
         ya.utm_medium,
         ya.utm_campaign,
         coalesce(sum(ya.daily_spent), 0) as daily_spent
-    FROM ya_ads as ya 
+    from ya_ads as ya 
     group by 1,2,3,4
 ), metrics as (
     select 
@@ -440,8 +440,7 @@ select
 from metrics as m
 group by 1, 2, 3, 4, 5
 having (m.revenue - m.total_cost) > 0
-order by 5 desc
-;
+order by 5 desc;
 
 ---
 with lpc as (
@@ -475,5 +474,4 @@ select
         from lpc
 where lpc.status_id is not null
 group by 1,3,4,5,6
-order by revenue desc
-;
+order by revenue desc;
