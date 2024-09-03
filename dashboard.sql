@@ -4,18 +4,17 @@
 with lp as (
     select
         date_trunc('week', s.visit_date) as start_week,
-        to_char(s.visit_date, 'yyyy-mm-dd') as date,
+        to_char(s.visit_date, 'yyyy-mm-dd') as dates,
         count(s.visitor_id) as count_visitor
-    from sessions s
+    from sessions as s
     group by 1, 2
 )
-        
-    select
-        sum(lp.count_visitor) as count_month,
-        round(sum(lp.count_visitor) / 5, 0) as count_week,
-        round(avg(lp.count_visitor), 0) as count_day
-    from lp
-;
+    
+select
+    sum(lp.count_visitor) as count_month,
+    round(sum(lp.count_visitor) / 5, 0) as count_week,
+    round(avg(lp.count_visitor), 0) as count_day
+from lp;
 
 --Какие каналы их приводят на сайт? Хочется видеть по дням/неделям/месяцам для по модели атрибуции Last Paid Click
 
