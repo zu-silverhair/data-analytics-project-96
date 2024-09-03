@@ -16,8 +16,8 @@ select
     round(avg(lp.count_visitor), 0) as count_day
 from lp;
 
---Какие каналы их приводят на сайт? Хочется видеть по дням/неделям/месяцам для по модели атрибуции Last Paid Click
-
+--Какие каналы их приводят на сайт? 
+--Хочется видеть по дням/неделям/месяцам для по модели атрибуции LastPaidClick
 --по дням недели
 with lpc as (
     select
@@ -33,56 +33,56 @@ with lpc as (
         l.status_id,
         row_number() over (partition by s.visitor_id order by s.visit_date desc) as rang
     from sessions as s
-    left join leads l on 
+    left join leads l on
         s.visitor_id = l.visitor_id
             and s.visit_date <= l.created_at
     where s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
-), unoin_ads as (
-select
+), 
+
+unoin_ads as (
+    select
         vk.campaign_date::date,
         vk.utm_source,
         vk.utm_medium,
-        vk.utm_campaign,
+        k.utm_campaign,
         sum(vk.daily_spent) as daily_spent
-    from vk_ads AS vk
-    group by 1,2,3,4
+    rom vk_ads AS vk
+    group by 1, 2, 3, 4
     union all
     select
-        ya.campaign_date::date,
+    ya.campaign_date::date,
         ya.utm_source,
         ya.utm_medium,
         ya.utm_campaign,
         sum(ya.daily_spent) as daily_spent
-    from ya_ads as ya 
-    group by 1,2,3,4
+    from ya_ads as ya
+    group by 1, 2, 3, 4
 )
 select 
-        --lpc.visit_date as start_day,
-        --date_trunc('week', lpc.visit_date) as start_week,
-        --to_char(lpc.visit_date, 'Month') as start_month,
-        to_char(lpc.visit_date, 'Day') as day_week,
-        to_char(lpc.visit_date, 'D') as day_week_number,
-        lpc.utm_source,
-        lpc.utm_medium,
-        lpc.utm_campaign,
-        count(lpc.visitor_id) as visitors_count
-        from lpc
+    --lpc.visit_date as start_day,
+    --date_trunc('week', lpc.visit_date) as start_week,
+    --to_char(lpc.visit_date, 'Month') as start_month,
+    to_char(lpc.visit_date, 'Day') as day_week,
+    to_char(lpc.visit_date, 'D') as day_week_number,
+    lpc.utm_source,
+    lpc.utm_medium,
+    lpc.utm_campaign,
+    count(lpc.visitor_id) as visitors_count
+from lpc
 left join unoin_ads as u 
     on u.campaign_date = lpc.visit_date
     and u.utm_source = lpc.utm_source
-    and    u.utm_medium = lpc.utm_medium 
-    and    u.utm_campaign = lpc.utm_campaign 
+    and u.utm_medium = lpc.utm_medium 
+    and u.utm_campaign = lpc.utm_campaign 
 where lpc.rang = 1
 group by 1,2,3,4,5
-order by day_week_number
-;
+order by day_week_number;
 
 --Сколько лидов к нам приходят?
 
 select
     count(l.lead_id) as count_leads
-from leads l 
-;
+from leads as l;
 
 --Какая конверсия из клика в лид? А из лида в оплату?
 
