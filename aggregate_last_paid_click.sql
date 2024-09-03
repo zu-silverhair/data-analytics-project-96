@@ -12,10 +12,10 @@ with lpc as (
         l.closing_reason,
         l.status_id,
         row_number() over (
-            partition by s.visitor_id order by s.visit_date desc) as rang
+            partition by s.visitor_id order by s.visit_date desc
+        ) as rang
     from sessions as s
-    left join leads as l
-    on s.visitor_id = l.visitor_id
+    left join leads as l on s.visitor_id = l.visitor_id
         and s.visit_date <= l.created_at
     where s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
 ),
@@ -38,7 +38,7 @@ unoin_ads as (
         sum(ya.daily_spent) as daily_spent
     from ya_ads as ya
     group by 1, 2, 3, 4
-)
+),
 
 select
     lpc.visit_date,
@@ -54,11 +54,11 @@ select
     sum(lpc.amount) as revenue
 from lpc
 left join unoin_ads as u
-on u.campaign_date = lpc.visit_date
-    and u.utm_source = lpc.utm_source
-    and u.utm_medium = lpc.utm_medium
-    and u.utm_campaign = lpc.utm_campaign
+    on u.campaign_date = lpc.visit_date
+        and u.utm_source = lpc.utm_source
+        and u.utm_medium = lpc.utm_medium
+        and u.utm_campaign = lpc.utm_campaign
 where lpc.rang = 1
 group by 1, 3, 4, 5, 6
-order by visitors_count desc, revenue desc nulls last
+order by revenue desc nulls last, visitors_count desc
 limit 15;
