@@ -31,13 +31,15 @@ with lpc as (
         l.amount,
         l.closing_reason,
         l.status_id,
-        row_number() over (partition by s.visitor_id order by s.visit_date desc) as rang
+        row_number() over (
+            partition by s.visitor_id order by s.visit_date desc
+        ) as rang
     from sessions as s
     left join leads l on
         s.visitor_id = l.visitor_id
             and s.visit_date <= l.created_at
     where s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
-), 
+),
 
 unoin_ads as (
     select
@@ -58,6 +60,7 @@ unoin_ads as (
     from ya_ads as ya
     group by 1, 2, 3, 4
 )
+
 select 
     --lpc.visit_date as start_day,
     --date_trunc('week', lpc.visit_date) as start_week,

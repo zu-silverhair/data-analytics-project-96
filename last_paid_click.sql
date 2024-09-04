@@ -1,4 +1,5 @@
 ---Напишите запрос для атрибуции лидов по модели Last Paid Click топ-10 записей
+
 with tab as (
     select
         s.visitor_id,
@@ -11,7 +12,7 @@ with tab as (
         l.amount,
         l.closing_reason,
         l.status_id,
-        row_number() over(partition by s.visitor_id order by s.visit_date desc) as rang
+        row_number() OVER (partition by s.visitor_id order by s.visit_date desc) as rang
     from sessions as s
     left join leads as l on s.visitor_id = l.visitor_id
         and s.visit_date < l.created_at
@@ -34,4 +35,3 @@ from tab
 where rang = 1
 order by amount desc nulls last, visit_date asc, utm_source, utm_medium, utm_campaign
 limit 10;
-	

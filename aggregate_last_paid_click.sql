@@ -15,8 +15,8 @@ with lpc as (
             partition by s.visitor_id order by s.visit_date desc
         ) as rang
     from sessions as s
-    left join leads as l on
-        s.visitor_id = l.visitor_id
+    left join 
+        leads as l on s.visitor_id = l.visitor_id
             and s.visit_date <= l.created_at
     where s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
 ),
@@ -40,6 +40,7 @@ unoin_ads as (
     from ya_ads as ya
     group by 1, 2, 3, 4
 )
+
 select
     lpc.visit_date,
     count(lpc.visitor_id) as visitors_count,
@@ -50,11 +51,11 @@ select
     count(distinct lpc.lead_id) as leads_count,
     count(lpc.lead_id) filter (
         where lpc.status_id = 142
-    ) as purchases_count,
+        ) as purchases_count,
     sum(lpc.amount) as revenue
 from lpc
 left join unoin_ads as u
-    on  
+    on 
         u.campaign_date = lpc.visit_date
         and u.utm_source = lpc.utm_source
         and u.utm_medium = lpc.utm_medium
