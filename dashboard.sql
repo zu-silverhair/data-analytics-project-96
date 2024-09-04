@@ -240,13 +240,13 @@ metrics as (
             where lpc.status_id = 142
         ) as purchases_count,
         coalesce(sum(lpc.amount), 0) as revenue
-        from lpc
+    from lpc
     left join unoin_ads as u
         on
             u.campaign_date = lpc.visit_date
             and u.utm_source = lpc.utm_source
-            and u.utm_medium = lpc.utm_medium 
-            and u.utm_campaign = lpc.utm_campaign 
+            and u.utm_medium = lpc.utm_medium
+            and u.utm_campaign = lpc.utm_campaign
     where lpc.rang = 1
     group by 1, 2, 3, 4, 6
 )
@@ -256,32 +256,36 @@ select
     m.utm_medium,
     m.utm_campaign,
     sum(m.visitors_count) as visitors_sum,
-    sum(m.leads_count) as leads_sum ,
+    sum(m.leads_count) as leads_sum,
     sum(m.purchases_count) as purchases_sum,
     sum(m.total_cost) as total_cost_sum,
     sum(m.revenue) as revenue_sum,
-    case 
+    case
         when sum(m.visitors_count) = 0 then 0
         else round(sum(m.total_cost) / sum(m.visitors_count))
-    end as CPU,
-    case 
+    end as cpu,
+    case
         when sum(m.leads_count) = 0 then 0
         else round(sum(m.total_cost) / sum(m.leads_count))
-    end as CPL,
-    case 
+    end as cpl,
+    case
         when sum(m.purchases_count) = 0 then 0
         else round(sum(m.total_cost) / sum(m.purchases_count))
-    end as CPPU,
-    case 
+    end as cppu,
+    case
         when sum(m.total_cost) = 0 then 0
-        else round(((sum(m.revenue) - sum(m.total_cost)) / sum(m.total_cost))*100, 0)
-    end as ROI
+        else round(
+            ((sum(m.revenue) - sum(m.total_cost)) / sum(m.total_cost)) * 100, 0
+        )
+    end as roi
 from metrics as m
 group by 1, 2, 3
 order by 12 desc;
 
----Через какое время после запуска компании маркетинг может анализировать компанию используя ваш дашборд? 
----Можно посчитать за сколько дней с момента перехода по рекламе закрывается 90% лидов.
+---Через какое время после запуска компании 
+---маркетинг может анализировать компанию используя ваш дашборд? 
+---Можно посчитать за сколько дней с момента перехода по рекламе
+---закрывается 90% лидов
 with lpc as (
     select
         s.visitor_id,
@@ -296,7 +300,7 @@ with lpc as (
         l.status_id,
         row_number() over(partition by s.visitor_id order by s.visit_date desc) as rang
     from sessions s 
-    left join leads l on s.visitor_id  = l.visitor_id 
+    left join leads l on s.visitor_id = l.visitor_id
         and s.visit_date <= l.created_at
 )
 select 
