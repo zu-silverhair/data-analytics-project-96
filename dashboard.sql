@@ -92,7 +92,7 @@ from leads as l;
 
 with lp as (
     select
-        to_char(s.visit_date, 'month') as start_month,
+        s.visit_date,
         count(distinct s.visitor_id) as count_visitors,
         count(distinct l.lead_id)::numeric as count_leads,
         count(l.lead_id) filter (
@@ -360,7 +360,7 @@ select
 from lpc
 where lpc.rang = 1
 group by 1, 2, 3, 4
-order by lpc.revenue desc;
+order by 8 desc;
 
 ---Любые другие инсайты, которые вы можете найти в данных
 
@@ -540,4 +540,4 @@ select
 from lpc
 where lpc.status_id is not null
 group by 1, 2, 3, 4, 5
-order by coalesce(sum(lpc.amount), 0) desc;
+order by 9 desc;
