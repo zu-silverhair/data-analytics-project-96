@@ -92,7 +92,7 @@ from leads as l;
 
 with lp as (
     select
-        s.visit_date,
+        date_trunc('month', s.visit_date),
         count(distinct s.visitor_id) as count_visitors,
         count(distinct l.lead_id)::numeric as count_leads,
         count(l.lead_id) filter (
