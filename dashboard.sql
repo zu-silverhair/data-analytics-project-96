@@ -275,9 +275,9 @@ select
     case
         when sum(m.total_cost) = 0 then 0
         else
-                    round(
-                        ((sum(m.revenue) - sum(m.total_cost)) / sum(m.total_cost)) * 100, 0
-                    )
+            round(
+                ((sum(m.revenue) - sum(m.total_cost)) / sum(m.total_cost)) * 100, 0
+            )
     end as roi
 from metrics as m
 group by 1, 2, 3
@@ -313,12 +313,13 @@ select
     lpc.utm_source,
     lpc.utm_medium,
     percentile_disc(0.90) within group (
-    order by date_part('day', lpc.created_at - lpc.visit_date)) as _day_leads
+        order by date_part('day', lpc.created_at - lpc.visit_date)
+    ) as _day_leads
 from lpc
 group by 1, 2
 order by 3 desc nulls last;
 
----Есть ли заметная корреляция между запуском рекламной компании и ростом органики?
+--Есть ли заметная корреляция между запуском рекламной компании/ростом органики
 
 with lpc as (
     select
@@ -333,12 +334,12 @@ with lpc as (
         l.closing_reason,
         l.status_id,
         row_number() over (
-                partition by s.visitor_id order by s.visit_date desc
-            ) as rang
+            partition by s.visitor_id order by s.visit_date desc
+        ) as rang
     from sessions as s
     left join leads as l
         on
-            s.visitor_id  = l.visitor_id
+            s.visitor_id= l.visitor_id
             and s.visit_date <= l.created_at
 )
 
@@ -349,7 +350,7 @@ select
     lpc.utm_campaign,
     count(lpc.visitor_id) as visitors_count,
     count(distinct lpc.lead_id) as leads_count,
-    count(lpc.lead_id)  filter (
+    count(lpc.lead_id)filter (
         where lpc.status_id = 142
     ) as purchases_count,
     coalesce(sum(lpc.amount), 0) as revenue
@@ -406,17 +407,17 @@ unoin_ads as (
 )
 
 select
-        lpc.utm_source,
-        coalesce(sum(u.daily_spent), 0) as total_cost,
-        coalesce(sum(lpc.amount), 0 ) as revenue,
-        coalesce((sum(lpc.amount)-sum(u.daily_spent)), 0) as pribil
-        from lpc
+    lpc.utm_source,
+    coalesce(sum(u.daily_spent), 0) as total_cost,
+    coalesce(sum(lpc.amount), 0 ) as revenue,
+    coalesce((sum(lpc.amount) - sum(u.daily_spent)), 0) as pribil
+from lpc
 left join unoin_ads as u
     on
         u.campaign_date = lpc.visit_date
         and u.utm_source = lpc.utm_source
-        and u.utm_medium = lpc.utm_medium 
-        and u.utm_campaign = lpc.utm_campaign 
+        and u.utm_medium = lpc.utm_medium
+        and u.utm_campaign = lpc.utm_campaign
 where lpc.rang = 1
 group by 1;
 
@@ -439,7 +440,7 @@ with lpc as (
     from sessions as s
     left join leads as l
         on
-            s.visitor_id  = l.visitor_id
+            s.visitor_id= l.visitor_id
             and s.visit_date <= l.created_at
     where s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
 ),
@@ -451,7 +452,7 @@ unoin_ads as (
         vk.utm_medium,
         vk.utm_campaign,
         coalesce(sum(vk.daily_spent), 0) as daily_spent
-    from vk_ads AS vk
+    from vk_ads as vk
     group by 1, 2, 3, 4
     union all
     select
@@ -460,9 +461,9 @@ unoin_ads as (
         ya.utm_medium,
         ya.utm_campaign,
         coalesce(sum(ya.daily_spent), 0) as daily_spent
-    from ya_ads as ya 
+    from ya_ads as ya
     group by 1, 2, 3, 4
-), 
+),
 
 metrics as (
     select
@@ -471,7 +472,7 @@ metrics as (
         lpc.utm_medium,
         lpc.utm_campaign,
         coalesce(u.daily_spent, 0) as total_cost,
-        coalesce(sum(lpc.amount), 0 ) as revenue
+        coalesce(sum(lpc.amount), 0) as revenue
     from lpc
     left join unoin_ads as u
         on
@@ -479,8 +480,9 @@ metrics as (
             and u.utm_source = lpc.utm_source
             and u.utm_medium = lpc.utm_medium
             and u.utm_campaign = lpc.utm_campaign 
-    where lpc.rang = 1
-    and lpc.utm_source in ('vk', 'yandex')
+    where
+        lpc.rang = 1
+        and lpc.utm_source in ('vk', 'yandex')
     group by 1, 2, 3, 4, 5
     order by revenue desc NULLS last
 )
@@ -513,10 +515,10 @@ with lpc as (
         l.amount,
         l.closing_reason,
         l.status_id
-    from sessions as s 
+    from sessions as s
     left join leads as l
         on
-            s.visitor_id  = l.visitor_id
+            s.visitor_id= l.visitor_id
             and s.visit_date <= l.created_at
 )
 
@@ -528,7 +530,7 @@ select
     lpc.learning_format,
     count(lpc.visitor_id) as visitors_count,
     count(distinct lpc.lead_id) as leads_count,
-    count(lpc.lead_id)  filter (
+    count(lpc.lead_id) filter (
         where lpc.status_id = 142
     ) as purchases_count,
     coalesce(sum(lpc.amount), 0) as revenue
