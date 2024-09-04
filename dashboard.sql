@@ -92,6 +92,7 @@ from leads as l;
 
 with lp as (
     select
+        to_char(s.visit_date, 'month') as start_month,
         count(distinct s.visitor_id) as count_visitors,
         count(distinct l.lead_id)::numeric as count_leads,
         count(l.lead_id) filter (
@@ -100,6 +101,7 @@ with lp as (
     from sessions as s
     left join leads as l
         on s.visitor_id = l.visitor_id
+    group by 1
 )
 
 select
@@ -275,7 +277,8 @@ select
     case
         when sum(m.total_cost) = 0 then 0
         else
-            round(((sum(m.revenue) - sum(m.total_cost)) / sum(m.total_cost)
+            round(
+                ((sum(m.revenue) - sum(m.total_cost)) / sum(m.total_cost)
                 ) * 100, 0
             )
     end as roi
@@ -357,7 +360,7 @@ select
 from lpc
 where lpc.rang = 1
 group by 1, 2, 3, 4
-order by revenue desc;
+order by lpc.revenue desc;
 
 ---Любые другие инсайты, которые вы можете найти в данных
 
@@ -484,7 +487,7 @@ metrics as (
         lpc.rang = 1
         and lpc.utm_source in ('vk', 'yandex')
     group by 1, 2, 3, 4, 5
-    order by revenue desc nulls last
+    order by 6 desc nulls last
 )
 
 select
@@ -537,4 +540,4 @@ select
 from lpc
 where lpc.status_id is not null
 group by 1, 2, 3, 4, 5
-order by revenue desc;
+order by coalesce(sum(lpc.amount), 0) desc;
