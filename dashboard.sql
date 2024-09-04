@@ -77,32 +77,32 @@ left join unoin_ads as u
     on
         u.campaign_date = lpc.visit_date
         and u.utm_source = lpc.utm_source
-        and u.utm_medium = lpc.utm_medium 
-        and u.utm_campaign = lpc.utm_campaign 
+        and u.utm_medium = lpc.utm_medium
+        and u.utm_campaign = lpc.utm_campaign
 where lpc.rang = 1
 group by 1, 2, 3, 5, 6
-order by day_week_number;
+order by day_week_number desc;
 
 --Сколько лидов к нам приходят?
 
-select
-    count(l.lead_id) as count_leads
+select count(l.lead_id) as count_leads
 from leads as l;
 
 --Какая конверсия из клика в лид? А из лида в оплату?
 
 with lp as (
-    select 
+    select
         count(distinct s.visitor_id) as count_visitors,
         count(distinct l.lead_id)::numeric as count_leads,
-        count(l.lead_id)  filter (
-            where l.status_id = 142) as purchases_count
+        count(l.lead_id) filter (
+            where l.status_id = 142
+        ) as purchases_count
     from sessions as s
     left join leads as l
         on s.visitor_id = l.visitor_id
 )
 
-select 
+select
     lp.count_visitors,
     lp.count_leads,
     lp.purchases_count,
@@ -127,13 +127,14 @@ with lpc as (
         row_number() over (
             partition by s.visitor_id order by s.visit_date desc
         ) as rang
-    from sessions as s 
+    from sessions as s
     left join leads as l
         on
-            s.visitor_id= l.visitor_id
+            s.visitor_id = l.visitor_id
             and s.visit_date <= l.created_at
-    where s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
-    and s."source" in ('vk', 'yandex')
+    where
+        s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
+        and s."source" in ('vk', 'yandex')
 ),
 
 unoin_ads as (
@@ -144,7 +145,7 @@ unoin_ads as (
         vk.utm_campaign,
         sum(vk.daily_spent) as daily_spent
     from vk_ads as vk
-    group by 1,2,3,4
+    group by 1, 2, 3, 4
     union all
     select
         ya.campaign_date::date,
@@ -156,15 +157,15 @@ unoin_ads as (
     group by 1, 2, 3, 4
 )
 
-    select
-        lpc.visit_date as start_day,
-        lpc.utm_source,
-        lpc.utm_medium,
-        lpc.utm_campaign,
-        coalesce(sum(u.daily_spent), 0) as total_cost,
-        to_char(lpc.visit_date, 'Day') as day_week,
-        extract(isodow from lpc.visit_date) as day_week_number
-        from lpc
+select
+    lpc.visit_date as start_day,
+    lpc.utm_source,
+    lpc.utm_medium,
+    lpc.utm_campaign,
+    coalesce(sum(u.daily_spent), 0) as total_cost,
+    to_char(lpc.visit_date, 'Day') as day_week,
+    extract(isodow from lpc.visit_date) as day_week_number
+from lpc
 left join unoin_ads as u
     on
         u.campaign_date = lpc.visit_date
@@ -175,10 +176,11 @@ where lpc.rang = 1
 group by 1, 2, 3, 4, 6
 order by 1;
 
----Окупаются ли каналы? Почему такая разницв между вk и яндекс/Обязательно рассчитать основные метрики;
+---Окупаются ли каналы? Почему такая разницв между вk и яндекс/
+---Обязательно рассчитать основные метрики;
 ------Шаг 5 Презентация и выводы
 ---Есть ли окупаемые каналы? Если да, то какие?
----Какие рекламные каналы стоит отключить, над какими нужно поработать и улучшить
+---Какие рекламные каналы стоит отключить,над какими нужно поработать/улучшить
 
 with lpc as (
     select
@@ -198,10 +200,11 @@ with lpc as (
     from sessions as s
     left join leads as l
         on
-            s.visitor_id  = l.visitor_id
+            s.visitor_id = l.visitor_id
             and s.visit_date <= l.created_at
-    where s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
-    and s."source" in ('vk', 'yandex')
+    where
+        s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
+        and s."source" in ('vk', 'yandex')
 ),
 
 unoin_ads as (
@@ -220,12 +223,12 @@ unoin_ads as (
         ya.utm_medium,
         ya.utm_campaign,
         sum(ya.daily_spent) as daily_spent
-    from ya_ads as ya 
+    from ya_ads as ya
     group by 1, 2, 3, 4
 ),
 
 metrics as (
-    select 
+    select
         lpc.visit_date,
         lpc.utm_source,
         lpc.utm_medium,
@@ -233,12 +236,13 @@ metrics as (
         count(distinct lpc.visitor_id) as visitors_count,
         coalesce(u.daily_spent, 0) as total_cost,
         count(distinct lpc.lead_id) as leads_count,
-        count(lpc.lead_id)  filter (
-            where lpc.status_id = 142) as purchases_count,
+        count(lpc.lead_id) filter (
+            where lpc.status_id = 142
+        ) as purchases_count,
         coalesce(sum(lpc.amount), 0) as revenue
         from lpc
     left join unoin_ads as u
-        on 
+        on
             u.campaign_date = lpc.visit_date
             and u.utm_source = lpc.utm_source
             and u.utm_medium = lpc.utm_medium 
