@@ -81,7 +81,7 @@ left join unoin_ads as u
         and u.utm_campaign = lpc.utm_campaign
 where lpc.rang = 1
 group by 1, 2, 3, 5, 6
-order by day_week_number desc;
+order by 6 asc;
 
 --Сколько лидов к нам приходят?
 
@@ -275,8 +275,8 @@ select
     case
         when sum(m.total_cost) = 0 then 0
         else
-            round(
-                ((sum(m.revenue) - sum(m.total_cost)) / sum(m.total_cost)) * 100, 0
+            round(((sum(m.revenue) - sum(m.total_cost)) / sum(m.total_cost)
+                ) * 100, 0
             )
     end as roi
 from metrics as m
@@ -339,7 +339,7 @@ with lpc as (
     from sessions as s
     left join leads as l
         on
-            s.visitor_id= l.visitor_id
+            s.visitor_id = l.visitor_id
             and s.visit_date <= l.created_at
 )
 
@@ -350,7 +350,7 @@ select
     lpc.utm_campaign,
     count(lpc.visitor_id) as visitors_count,
     count(distinct lpc.lead_id) as leads_count,
-    count(lpc.lead_id)filter (
+    count(lpc.lead_id) filter (
         where lpc.status_id = 142
     ) as purchases_count,
     coalesce(sum(lpc.amount), 0) as revenue
@@ -409,7 +409,7 @@ unoin_ads as (
 select
     lpc.utm_source,
     coalesce(sum(u.daily_spent), 0) as total_cost,
-    coalesce(sum(lpc.amount), 0 ) as revenue,
+    coalesce(sum(lpc.amount), 0) as revenue,
     coalesce((sum(lpc.amount) - sum(u.daily_spent)), 0) as pribil
 from lpc
 left join unoin_ads as u
@@ -423,7 +423,7 @@ group by 1;
 
 ---ANY
 with lpc as (
-    select 
+    select
         s.visitor_id,
         s.visit_date::date,
         s."source" as utm_source,
@@ -440,7 +440,7 @@ with lpc as (
     from sessions as s
     left join leads as l
         on
-            s.visitor_id= l.visitor_id
+            s.visitor_id = l.visitor_id
             and s.visit_date <= l.created_at
     where s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
 ),
@@ -479,16 +479,16 @@ metrics as (
             u.campaign_date = lpc.visit_date
             and u.utm_source = lpc.utm_source
             and u.utm_medium = lpc.utm_medium
-            and u.utm_campaign = lpc.utm_campaign 
+            and u.utm_campaign = lpc.utm_campaign
     where
         lpc.rang = 1
         and lpc.utm_source in ('vk', 'yandex')
     group by 1, 2, 3, 4, 5
-    order by revenue desc NULLS last
+    order by revenue desc nulls last
 )
 
 select
-  --m.start_day,
+    --m.start_day,
     utm_source,
     utm_medium,
     utm_campaign,
@@ -518,7 +518,7 @@ with lpc as (
     from sessions as s
     left join leads as l
         on
-            s.visitor_id= l.visitor_id
+            s.visitor_id = l.visitor_id
             and s.visit_date <= l.created_at
 )
 
