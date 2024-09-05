@@ -25,17 +25,18 @@ with tab as (
 )
 
 select
-    visitor_id,
-    visit_date,
-    utm_source,
-    utm_medium,
-    utm_campaign,
-    lead_id,
-    created_at,
-    amount,
-    closing_reason,
-    status_id
+    tab.visitor_id,
+    tab.visit_date,
+    tab.utm_source,
+    tab.utm_medium,
+    tab.utm_campaign,
+    tab.lead_id,
+    tab.created_at,
+    tab.amount,
+    tab.closing_reason,
+    tab.status_id
 from tab
 where rang = 1
-order by tab.visit_date asc, tab.utm_source asc, tab.utm_medium asc, tab.utm_campaign asc, tab.amount desc nulls last
+order by tab.visit_date asc, tab.utm_source asc, tab.utm_medium asc,
+    tab.utm_campaign asc, tab.amount desc nulls last
 limit 10;
