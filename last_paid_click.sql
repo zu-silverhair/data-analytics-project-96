@@ -20,7 +20,7 @@ with tab as (
         on
             s.visitor_id = l.visitor_id
             and s.visit_date <= l.created_at
-    where s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
+    where s.medium != 'organic'
     order by s.visit_date desc
 )
 
@@ -37,6 +37,5 @@ select
     status_id
 from tab
 where rang = 1
-order by
-    8 desc nulls last, 2 asc,3 asc, 4 asc, 5 asc
+order by 2 asc, 3 asc, 4 asc, 5 asc, 8 desc nulls last
 limit 10;
