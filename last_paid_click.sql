@@ -19,7 +19,7 @@ with tab as (
     left join leads as l
         on
             s.visitor_id = l.visitor_id
-            and s.visit_date < l.created_at
+            and s.visit_date <= l.created_at
     where s.medium in ('cpc', 'cpm', 'cpa', 'youtube', 'cpp', 'tg', 'social')
     order by s.visit_date desc
 )
@@ -38,5 +38,5 @@ select
 from tab
 where rang = 1
 order by
-    amount desc nulls last
+    8 desc nulls last, 2 asc,3 asc, 4 asc, 5 asc
 limit 10;

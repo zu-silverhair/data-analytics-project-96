@@ -77,5 +77,5 @@ select
     purchases_count,
     revenue
 from metrics
-order by 9 desc nulls last
+order by 9 desc nulls last, 1 asc, 2 desc, 3 asc, 4 asc, 5 asc
 limit 15;
