@@ -37,7 +37,7 @@ select
     tab.status_id
 from tab
 where tab.rang = 1
-order by 
+order by
     tab.visit_date asc, tab.utm_source asc, tab.utm_medium asc,
     tab.utm_campaign asc, tab.amount desc nulls last
 limit 10;
