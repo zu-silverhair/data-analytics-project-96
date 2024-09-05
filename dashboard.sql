@@ -116,14 +116,15 @@ from lp;*/
     count(l.lead_id) filter (
         where l.status_id = 142
     ) as purchases_count,
-    round((count(distinct l.lead_id)::numeric) / (count(distinct s.visitor_id)) * 100, 2) as conversion_lead,
+    round((count(distinct l.lead_id)::numeric) / (count(distinct s.visitor_id)
+    ) * 100, 2) as conversion_lead,
     round((count(l.lead_id) filter (
         where l.status_id = 142
     )) / (count(distinct l.lead_id)::numeric) * 100, 2) as conversion_amlead
 from sessions as s
 left join leads as l
     on s.visitor_id = l.visitor_id;*/
-    
+
 --Сколько мы тратим по разным каналам в динамике? только для вк и яндекс
 
 with lpc as (
