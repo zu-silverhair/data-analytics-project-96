@@ -36,7 +36,8 @@ select
     tab.closing_reason,
     tab.status_id
 from tab
-where rang = 1
-order by tab.visit_date asc, tab.utm_source asc, tab.utm_medium asc,
+where tab.rang = 1
+order by 
+    tab.visit_date asc, tab.utm_source asc, tab.utm_medium asc,
     tab.utm_campaign asc, tab.amount desc nulls last
 limit 10;
