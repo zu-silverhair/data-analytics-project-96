@@ -110,16 +110,15 @@ select
 from lp;*/
 
 select
-    1,
-    count(distinct s.visitor_id) as count_visitors,
-    count(distinct l.lead_id)::numeric as count_leads,
     count(l.lead_id) filter (
         where l.status_id = 142
     ) as purchases_count,
     round((count(distinct l.lead_id)::numeric) / (count(distinct s.visitor_id)) * 100, 2) as conversion_lead,
     round((count(l.lead_id) filter (
         where l.status_id = 142
-    )) / (count(distinct l.lead_id)::numeric) * 100, 2) as conversion_amlead
+    )) / (count(distinct l.lead_id)::numeric) * 100, 2) as conversion_amlead,
+    count(distinct s.visitor_id) as count_visitors,
+    count(distinct l.lead_id)::numeric as count_leads
 from sessions as s
 left join leads as l
     on s.visitor_id = l.visitor_id;
