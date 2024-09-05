@@ -109,9 +109,8 @@ select
     round((lp.purchases_count / lp.count_leads) * 100, 2) as conversion_amlead
 from lp;*/
 
-select
+/*select
     1 as june,
-    l.lead_id,
     count(distinct s.visitor_id) as count_visitors,
     count(distinct l.lead_id)::numeric as count_leads,
     count(l.lead_id) filter (
@@ -123,8 +122,7 @@ select
     )) / (count(distinct l.lead_id)::numeric) * 100, 2) as conversion_amlead
 from sessions as s
 left join leads as l
-    on s.visitor_id = l.visitor_id
-group by 2;
+    on s.visitor_id = l.visitor_id;*/
     
 --Сколько мы тратим по разным каналам в динамике? только для вк и яндекс
 
