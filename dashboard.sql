@@ -110,6 +110,7 @@ select
 from lp;*/
 
 select
+    1,
     count(distinct s.visitor_id) as count_visitors,
     count(distinct l.lead_id)::numeric as count_leads,
     count(l.lead_id) filter (
